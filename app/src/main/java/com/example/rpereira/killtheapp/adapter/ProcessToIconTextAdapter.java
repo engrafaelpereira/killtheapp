@@ -33,19 +33,20 @@ public class ProcessToIconTextAdapter extends ArrayAdapter<Process> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        View rowView = convertView;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            View rowView = inflater.inflate(R.layout.row_icon_text, parent, false);
-            ImageView imageView = (ImageView) rowView.findViewById(R.id.item_icon);
-            imageView.setImageDrawable(processes.get(position).getIcon());
-
-            TextView textView = (TextView) rowView.findViewById(R.id.item_title);
-            textView.setText(processes.get(position).toString());
-
-            return rowView;
+            rowView = inflater.inflate(R.layout.row_icon_text, parent, false);
         }
-        return convertView;
+
+        ImageView imageView = (ImageView) rowView.findViewById(R.id.item_icon);
+        imageView.setImageDrawable(processes.get(position).getIcon());
+
+        TextView textView = (TextView) rowView.findViewById(R.id.item_title);
+        textView.setText(processes.get(position).toString());
+
+        return rowView;
     }
 }
