@@ -1,9 +1,12 @@
 package com.example.rpereira.killtheapp;
 
+import android.animation.Animator;
 import android.app.ActivityManager;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -31,9 +35,9 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class KillTheApp extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = KillTheApp.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private Context context;
     private ActivityManager activityManager;
@@ -51,8 +55,8 @@ public class KillTheApp extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        this.addButton = (FloatingActionButton) findViewById(R.id.addButton);
-        setAddButtonAction();
+        this.addButton = (FloatingActionButton) findViewById(R.id.refreshButton);
+        setRefreshButtonAction();
 
         this.listView = (ListView) findViewById(R.id.listView);
         setViewListAction();
@@ -69,7 +73,7 @@ public class KillTheApp extends AppCompatActivity {
     }
 
     private void setKillProcessAlertDialog(final View view, final Process process) {
-        new AlertDialog.Builder(KillTheApp.this)
+        new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Alert")
                 .setMessage("Do you really want to kill " + process.getName() + "?")
                 .setIconAttribute(android.R.attr.alertDialogIcon)
@@ -82,6 +86,7 @@ public class KillTheApp extends AppCompatActivity {
                                     .setAction("Action", null).show();
                         }
                         listApps();
+                        animateList(view, listView);
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
@@ -96,13 +101,11 @@ public class KillTheApp extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up addButton, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_about) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
             return true;
         }
 
@@ -115,13 +118,27 @@ public class KillTheApp extends AppCompatActivity {
         listApps();
     }
 
-    private void setAddButtonAction() {
+    private void setRefreshButtonAction() {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View buttonView) {
                 listApps();
+                animateList(buttonView, listView);
             }
         });
+    }
+
+    private void animateList(View startView, View destinationView) {
+        // get the center for the button
+        int cx = (startView.getLeft() + startView.getRight()) / 2;
+        int cy = (startView.getTop() + startView.getBottom()) / 2;
+
+        // get the final radius for the clipping circle
+        int finalRadius = Math.max(destinationView.getWidth(), destinationView.getHeight());
+
+        // create the animator for this view (the start radius is zero)
+        Animator anim = ViewAnimationUtils.createCircularReveal(destinationView, cx, cy, 0, finalRadius);
+        anim.start();
     }
 
     private void listApps() {
