@@ -79,10 +79,10 @@ public class ProcessListRecycleViewAdapter extends RecyclerView.Adapter<ProcessL
         }
     }
 
-    public class ProcessSortedListCallback extends SortedList.Callback<Process> {
+    private class ProcessSortedListCallback extends SortedList.Callback<Process> {
         private ProcessListRecycleViewAdapter processListRecycleViewAdapter;
 
-        public ProcessSortedListCallback(ProcessListRecycleViewAdapter processListRecycleViewAdapter) {
+        private ProcessSortedListCallback(ProcessListRecycleViewAdapter processListRecycleViewAdapter) {
             this.processListRecycleViewAdapter = processListRecycleViewAdapter;
         }
 
