@@ -1,4 +1,4 @@
-package com.example.rpereira.killtheapp.adapter;
+package com.rpereira.killtheapp.adapter;
 
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.rpereira.killtheapp.R;
-import com.example.rpereira.killtheapp.model.Process;
+import com.rpereira.killtheapp.R;
+import com.rpereira.killtheapp.model.Process;
 
 import java.util.List;
 

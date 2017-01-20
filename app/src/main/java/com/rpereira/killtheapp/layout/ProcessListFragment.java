@@ -1,4 +1,4 @@
-package com.example.rpereira.killtheapp.layout;
+package com.rpereira.killtheapp.layout;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -19,11 +19,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.rpereira.killtheapp.R;
-import com.example.rpereira.killtheapp.adapter.ProcessListRecycleViewAdapter;
-import com.example.rpereira.killtheapp.model.Process;
 import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
+import com.rpereira.killtheapp.R;
+import com.rpereira.killtheapp.adapter.ProcessListRecycleViewAdapter;
+import com.rpereira.killtheapp.model.Process;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;

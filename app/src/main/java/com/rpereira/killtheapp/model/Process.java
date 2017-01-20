@@ -1,4 +1,4 @@
-package com.example.rpereira.killtheapp.model;
+package com.rpereira.killtheapp.model;
 
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
