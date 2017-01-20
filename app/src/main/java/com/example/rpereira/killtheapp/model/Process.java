@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 
 /**
  * Process
- * Created by rpereira on 17/11/16.
+ *
+ * @author rpereira
+ * @since 17/11/16.
  */
 
 public class Process implements Comparable<Process> {
@@ -41,8 +43,12 @@ public class Process implements Comparable<Process> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Process process = (Process) o;
 

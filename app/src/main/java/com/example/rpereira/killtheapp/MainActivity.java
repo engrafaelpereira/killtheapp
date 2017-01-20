@@ -7,9 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import layout.AboutFragment;
-import layout.ProcessListFragment;
-
+import com.example.rpereira.killtheapp.layout.AboutFragment;
+import com.example.rpereira.killtheapp.layout.ProcessListFragment;
 
 public class MainActivity extends AppCompatActivity {
 

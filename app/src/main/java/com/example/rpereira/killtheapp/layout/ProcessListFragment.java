@@ -1,4 +1,4 @@
-package layout;
+package com.example.rpereira.killtheapp.layout;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,7 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by rpereira on 16/01/17.
+ * ProcessListFragment
+ *
+ * @author rpereira
+ * @since 16/01/17.
  *
  */
 public class ProcessListFragment extends Fragment {
@@ -38,7 +42,7 @@ public class ProcessListFragment extends Fragment {
 
     private RecyclerView processListRecyclerView;
     private ProcessListRecycleViewAdapter processListRecyclerViewAdapter;
-    private FloatingActionButton addButton;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,15 +50,38 @@ public class ProcessListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_process_list, container, false);
 
-        this.addButton = (FloatingActionButton) view.findViewById(R.id.refreshButton);
-        setRefreshButtonAction();
+        initRefreshButton(view);
+        initSwipeRefreshLayout(view);
+        initProcessListRecyclerView(view);
 
+        return view;
+    }
+
+    private void initProcessListRecyclerView(View view) {
         this.processListRecyclerView = (RecyclerView) view.findViewById(R.id.processListRecyclerView);
         this.processListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         this.processListRecyclerViewAdapter = new ProcessListRecycleViewAdapter(setViewListAction());
         this.processListRecyclerView.setAdapter(processListRecyclerViewAdapter);
+    }
 
-        return view;
+    private void initSwipeRefreshLayout(View view) {
+        this.swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        this.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                listProcess();
+            }
+        });
+    }
+
+    private void initRefreshButton(View view) {
+        FloatingActionButton addButton = (FloatingActionButton) view.findViewById(R.id.refreshButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View buttonView) {
+                listProcess();
+            }
+        });
     }
 
     @Override
@@ -96,15 +123,6 @@ public class ProcessListFragment extends Fragment {
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
-    private void setRefreshButtonAction() {
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View buttonView) {
-                listProcess();
-            }
-        });
-    }
-
     private void listProcess() {
         List<AndroidAppProcess> runningAppProcesses = AndroidProcesses.getRunningAppProcesses();
         final PackageManager pm = getActivity().getPackageManager();
@@ -116,7 +134,9 @@ public class ProcessListFragment extends Fragment {
             newProcessList.add(new Process(runningProcess.pid, name,
                     runningProcess.getPackageName(), icon));
         }
-        processListRecyclerViewAdapter.updateList(newProcessList);
+
+        this.processListRecyclerViewAdapter.updateList(newProcessList);
+        this.swipeRefreshLayout.setRefreshing(false);
     }
 
     private String getProcessName(PackageManager pm, AndroidAppProcess runningProcess) {
@@ -128,7 +148,6 @@ public class ProcessListFragment extends Fragment {
             return runningProcess.name;
         }
     }
-
 
     private boolean isPackageRunning(String packageName) {
         if (packageName == null) {
@@ -157,7 +176,6 @@ public class ProcessListFragment extends Fragment {
         Log.i(TAG, "Killed process: " + packageName + "; result: " + result);
         return result;
     }
-
 
     @Nullable
     private Drawable getAppIcon(PackageManager pm, AndroidAppProcess u) {

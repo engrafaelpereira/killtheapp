@@ -14,8 +14,10 @@ import com.example.rpereira.killtheapp.model.Process;
 import java.util.List;
 
 /**
- * Created by rpereira on 19/01/17.
+ * ProcessListRecycleViewAdapter
  *
+ * @author rpereira
+ * @since 19/01/17
  */
 
 public class ProcessListRecycleViewAdapter extends RecyclerView.Adapter<ProcessListRecycleViewAdapter.ViewHolder> {
@@ -25,42 +27,7 @@ public class ProcessListRecycleViewAdapter extends RecyclerView.Adapter<ProcessL
 
     public ProcessListRecycleViewAdapter(View.OnClickListener itemListener) {
         super();
-        this.processSortedList = new SortedList<>(Process.class, new SortedList.Callback<Process>() {
-            @Override
-            public int compare(Process p1, Process p2) {
-                return p2.compareTo(p1);
-            }
-
-            @Override
-            public void onInserted(int position, int count) {
-                notifyItemRangeInserted(position, count);
-            }
-
-            @Override
-            public void onRemoved(int position, int count) {
-                notifyItemRangeRemoved(position, count);
-            }
-
-            @Override
-            public void onMoved(int fromPosition, int toPosition) {
-                notifyItemMoved(fromPosition, toPosition);
-            }
-
-            @Override
-            public void onChanged(int position, int count) {
-                notifyItemRangeChanged(position, count);
-            }
-
-            @Override
-            public boolean areContentsTheSame(Process oldItem, Process newItem) {
-                return oldItem.getName().equals(newItem.getName());
-            }
-
-            @Override
-            public boolean areItemsTheSame(Process item1, Process item2) {
-                return item1.equals(item2);
-            }
-        });
+        this.processSortedList = new SortedList<>(Process.class, new ProcessSortedListCallback(this));
         this.itemListener = itemListener;
     }
 
@@ -109,6 +76,49 @@ public class ProcessListRecycleViewAdapter extends RecyclerView.Adapter<ProcessL
             if (!newProcessList.contains(processSortedList.get(i))) {
                 processSortedList.removeItemAt(i);
             }
+        }
+    }
+
+    public class ProcessSortedListCallback extends SortedList.Callback<Process> {
+        private ProcessListRecycleViewAdapter processListRecycleViewAdapter;
+
+        public ProcessSortedListCallback(ProcessListRecycleViewAdapter processListRecycleViewAdapter) {
+            this.processListRecycleViewAdapter = processListRecycleViewAdapter;
+        }
+
+        @Override
+        public int compare(Process p1, Process p2) {
+            return p2.compareTo(p1);
+        }
+
+        @Override
+        public void onInserted(int position, int count) {
+            processListRecycleViewAdapter.notifyItemRangeInserted(position, count);
+        }
+
+        @Override
+        public void onRemoved(int position, int count) {
+            processListRecycleViewAdapter.notifyItemRangeRemoved(position, count);
+        }
+
+        @Override
+        public void onMoved(int fromPosition, int toPosition) {
+            processListRecycleViewAdapter.notifyItemMoved(fromPosition, toPosition);
+        }
+
+        @Override
+        public void onChanged(int position, int count) {
+            processListRecycleViewAdapter.notifyItemRangeChanged(position, count);
+        }
+
+        @Override
+        public boolean areContentsTheSame(Process oldItem, Process newItem) {
+            return oldItem.getName().equals(newItem.getName());
+        }
+
+        @Override
+        public boolean areItemsTheSame(Process item1, Process item2) {
+            return item1.equals(item2);
         }
     }
 }

@@ -1,4 +1,4 @@
-package layout;
+package com.example.rpereira.killtheapp.layout;
 
 import android.app.Fragment;
 import android.os.Bundle;
