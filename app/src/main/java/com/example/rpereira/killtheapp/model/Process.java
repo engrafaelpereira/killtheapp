@@ -46,10 +46,8 @@ public class Process implements Comparable<Process> {
 
         Process process = (Process) o;
 
-        if (pid != process.pid) return false;
-        if (!name.equals(process.name)) return false;
-        if (!packageName.equals(process.packageName)) return false;
-        return icon != null ? icon.equals(process.icon) : process.icon == null;
+        return pid == process.pid && name.equals(process.name)
+                && packageName.equals(process.packageName);
     }
 
     @Override

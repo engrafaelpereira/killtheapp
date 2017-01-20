@@ -1,7 +1,5 @@
 package layout;
 
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -13,23 +11,21 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import com.example.rpereira.killtheapp.R;
-import com.example.rpereira.killtheapp.adapter.ProcessToIconTextAdapter;
+import com.example.rpereira.killtheapp.adapter.ProcessListRecycleViewAdapter;
 import com.example.rpereira.killtheapp.model.Process;
 import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,7 +36,8 @@ public class ProcessListFragment extends Fragment {
 
     private static final String TAG = ProcessListFragment.class.getSimpleName();
 
-    private ListView listView;
+    private RecyclerView processListRecyclerView;
+    private ProcessListRecycleViewAdapter processListRecyclerViewAdapter;
     private FloatingActionButton addButton;
 
     @Override
@@ -52,32 +49,35 @@ public class ProcessListFragment extends Fragment {
         this.addButton = (FloatingActionButton) view.findViewById(R.id.refreshButton);
         setRefreshButtonAction();
 
-        this.listView = (ListView) view.findViewById(R.id.listView);
-        setViewListAction();
-        listApps(false);
+        this.processListRecyclerView = (RecyclerView) view.findViewById(R.id.processListRecyclerView);
+        this.processListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        this.processListRecyclerViewAdapter = new ProcessListRecycleViewAdapter(setViewListAction());
+        this.processListRecyclerView.setAdapter(processListRecyclerViewAdapter);
+
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        listApps(false);
+        listProcess();
     }
 
-    private void setViewListAction() {
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private View.OnClickListener setViewListAction() {
+        return new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, final View view, int position, long id) {
-                final Process process = (Process) listView.getItemAtPosition(position);
-                setKillProcessAlertDialog(view, process);
+            public void onClick(View v) {
+                int position = processListRecyclerView.getChildLayoutPosition(v);
+                Process process = processListRecyclerViewAdapter.get(position);
+                setKillProcessAlertDialog(processListRecyclerView, process);
             }
-        });
+        };
     }
 
     private void setKillProcessAlertDialog(final View view, final Process process) {
         new AlertDialog.Builder(getActivity())
                 .setTitle("Alert")
-                .setMessage("Do you really want to kill " + process.getName() + "?")
+                .setMessage("Do you really want to kill " + process.getName() + "? " + process.getPid())
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
@@ -86,7 +86,7 @@ public class ProcessListFragment extends Fragment {
                         if (killProcess(process)) {
                             Snackbar.make(view, "Kill the app: " + process.getName(), Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
-                            listApps(true);
+                            listProcess();
                         } else {
                             Snackbar.make(view, "Impossible to kill: " + process.getName(), Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
@@ -100,42 +100,29 @@ public class ProcessListFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View buttonView) {
-                listApps(true);
+                listProcess();
             }
         });
     }
 
-    private void animateList() {
-        AnimatorSet flip = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),
-                R.animator.card_flip_full);
-        flip.setTarget(listView);
-        flip.start();
-    }
-
-    private void listApps(final boolean animate) {
-        if (animate) {
-            animateList();
-        }
-
+    private void listProcess() {
         List<AndroidAppProcess> runningAppProcesses = AndroidProcesses.getRunningAppProcesses();
         final PackageManager pm = getActivity().getPackageManager();
 
-        List<Process> processes = new ArrayList<>();
+        List<Process> newProcessList = new ArrayList<>();
         for (AndroidAppProcess runningProcess : runningAppProcesses) {
             Drawable icon = getAppIcon(pm, runningProcess);
             String name = getProcessName(pm, runningProcess);
-            processes.add(new Process(runningProcess.pid, name,
+            newProcessList.add(new Process(runningProcess.pid, name,
                     runningProcess.getPackageName(), icon));
         }
-        Collections.sort(processes, Collections.<Process>reverseOrder());
-
-        ListAdapter adapter = new ProcessToIconTextAdapter(getActivity(), processes);
-        listView.setAdapter(adapter);
+        processListRecyclerViewAdapter.updateList(newProcessList);
     }
 
     private String getProcessName(PackageManager pm, AndroidAppProcess runningProcess) {
         try {
-            CharSequence label = pm.getApplicationLabel(pm.getApplicationInfo(runningProcess.getPackageName(), PackageManager.GET_META_DATA));
+            CharSequence label = pm.getApplicationLabel(
+                    pm.getApplicationInfo(runningProcess.getPackageName(), PackageManager.GET_META_DATA));
             return label.toString();
         } catch (PackageManager.NameNotFoundException e) {
             return runningProcess.name;
