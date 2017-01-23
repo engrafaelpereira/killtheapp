@@ -13,13 +13,15 @@ import android.support.annotation.NonNull;
 public class Process implements Comparable<Process> {
 
     private final int pid;
+    private final int parentPid;
     private final String name;
     private final String packageName;
     private final Drawable icon;
 
-    public Process(int pid, String name, String packageName, Drawable icon) {
+    public Process(int pid, int parentPid, String name, String packageName, Drawable icon) {
 
         this.pid = pid;
+        this.parentPid = parentPid;
         this.name = name;
         this.packageName = packageName;
         this.icon = icon;
@@ -27,6 +29,10 @@ public class Process implements Comparable<Process> {
 
     public int getPid() {
         return pid;
+    }
+
+    public int getParentPid() {
+        return parentPid;
     }
 
     public String getName() {

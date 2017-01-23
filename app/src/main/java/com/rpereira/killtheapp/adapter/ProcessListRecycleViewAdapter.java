@@ -75,6 +75,7 @@ public class ProcessListRecycleViewAdapter extends RecyclerView.Adapter<ProcessL
         for (int i = 0; i < processSortedList.size(); i++) {
             if (!newProcessList.contains(processSortedList.get(i))) {
                 processSortedList.removeItemAt(i);
+                i--;
             }
         }
     }

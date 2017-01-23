@@ -1,12 +1,14 @@
 package com.rpereira.killtheapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.rpereira.killtheapp.activity.SettingsActivity;
 import com.rpereira.killtheapp.layout.AboutFragment;
 import com.rpereira.killtheapp.layout.ProcessListFragment;
 
@@ -42,12 +44,17 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_about) {
-            flipCard();
-            return true;
+        switch (id) {
+            case R.id.action_about:
+                flipCard();
+                return true;
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void flipCard() {

@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,9 +24,11 @@ import android.view.ViewGroup;
 import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
 import com.rpereira.killtheapp.R;
+import com.rpereira.killtheapp.activity.SettingsActivity;
 import com.rpereira.killtheapp.adapter.ProcessListRecycleViewAdapter;
 import com.rpereira.killtheapp.model.Process;
 
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +40,15 @@ import java.util.List;
  * @since 16/01/17.
  *
  */
-public class ProcessListFragment extends Fragment {
+public class ProcessListFragment extends Fragment
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = ProcessListFragment.class.getSimpleName();
 
     private RecyclerView processListRecyclerView;
     private ProcessListRecycleViewAdapter processListRecyclerViewAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isListAll = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,8 +59,15 @@ public class ProcessListFragment extends Fragment {
         initRefreshButton(view);
         initSwipeRefreshLayout(view);
         initProcessListRecyclerView(view);
+        initSharedPreferences();
 
         return view;
+    }
+
+    private void initSharedPreferences() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sharedPref.registerOnSharedPreferenceChangeListener(this);
+        this.isListAll = sharedPref.getBoolean(SettingsActivity.KEY_LIST_ALL, true);
     }
 
     private void initProcessListRecyclerView(View view) {
@@ -128,13 +141,19 @@ public class ProcessListFragment extends Fragment {
         final PackageManager pm = getActivity().getPackageManager();
 
         List<Process> newProcessList = new ArrayList<>();
-        for (AndroidAppProcess runningProcess : runningAppProcesses) {
-            Drawable icon = getAppIcon(pm, runningProcess);
-            String name = getProcessName(pm, runningProcess);
-            newProcessList.add(new Process(runningProcess.pid, name,
-                    runningProcess.getPackageName(), icon));
+        try {
+            for (AndroidAppProcess runningProcess : runningAppProcesses) {
+                Drawable icon = getAppIcon(pm, runningProcess);
+                if (isListAll || icon != null) {
+                    String name = getProcessName(pm, runningProcess);
+                    newProcessList.add(new Process(runningProcess.stat().getPid(),
+                            runningProcess.stat().ppid(), name,
+                            runningProcess.getPackageName(), icon));
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Fail to get the stat", e);
         }
-
         this.processListRecyclerViewAdapter.updateList(newProcessList);
         this.swipeRefreshLayout.setRefreshing(false);
     }
@@ -164,11 +183,10 @@ public class ProcessListFragment extends Fragment {
     }
 
     private boolean killProcess(Process process) {
-        int pid = process.getPid();
+        android.os.Process.killProcess(process.getPid());
+        android.os.Process.killProcess(process.getParentPid());
+
         String packageName = process.getPackageName();
-
-        android.os.Process.killProcess(pid);
-
         ActivityManager activityManager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
         activityManager.killBackgroundProcesses(packageName);
         boolean result = !isPackageRunning(packageName);
@@ -187,4 +205,12 @@ public class ProcessListFragment extends Fragment {
         }
         return icon;
     }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key) {
+        if (key.equals(SettingsActivity.KEY_LIST_ALL)) {
+            isListAll = sharedPreferences.getBoolean(SettingsActivity.KEY_LIST_ALL, true);
+        }
+    }
+
 }
