@@ -1,4 +1,4 @@
-package com.rpereira.killtheapp;
+package com.rpereira.killtheapp.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.rpereira.killtheapp.activity.SettingsActivity;
+import com.rpereira.killtheapp.R;
 import com.rpereira.killtheapp.layout.AboutFragment;
 import com.rpereira.killtheapp.layout.ProcessListFragment;
 

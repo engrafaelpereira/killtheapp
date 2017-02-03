@@ -117,7 +117,7 @@ public class ProcessListFragment extends Fragment
     private void setKillProcessAlertDialog(final View view, final Process process) {
         new AlertDialog.Builder(getActivity())
                 .setTitle("Alert")
-                .setMessage("Do you really want to kill " + process.getName() + "? " + process.getPid())
+                .setMessage("Do you really want to kill " + process.getName() + "?\n[pid: " + process.getPid() + "]")
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
