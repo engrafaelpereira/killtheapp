@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.jaredrummler.android.processes.AndroidProcesses;
 import com.jaredrummler.android.processes.models.AndroidAppProcess;
@@ -88,8 +88,8 @@ public class ProcessListFragment extends Fragment
     }
 
     private void initRefreshButton(View view) {
-        FloatingActionButton addButton = (FloatingActionButton) view.findViewById(R.id.refreshButton);
-        addButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton refreshButton = (ImageButton) view.findViewById(R.id.refreshButton);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View buttonView) {
                 listProcess();

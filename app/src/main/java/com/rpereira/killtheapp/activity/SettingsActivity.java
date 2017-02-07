@@ -1,8 +1,8 @@
 package com.rpereira.killtheapp.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.AppCompatActivity;
 
 import com.rpereira.killtheapp.R;
 
@@ -10,7 +10,7 @@ import com.rpereira.killtheapp.R;
  * @author rpereira
  * @since 23/01/17.
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends Activity {
 
     public static final String KEY_LIST_ALL = "list_all";
 
