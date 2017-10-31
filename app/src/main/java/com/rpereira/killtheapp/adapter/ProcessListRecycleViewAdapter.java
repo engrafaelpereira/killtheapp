@@ -41,6 +41,9 @@ public class ProcessListRecycleViewAdapter extends RecyclerView.Adapter<ProcessL
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.imageView.setImageDrawable(processSortedList.get(position).getIcon());
+        String tag = "transitionProcessIcon" + position;
+//        holder.imageView.setTransitionName(tag);
+        holder.imageView.setTag(tag);
         holder.textView.setText(processSortedList.get(position).toString());
     }
 

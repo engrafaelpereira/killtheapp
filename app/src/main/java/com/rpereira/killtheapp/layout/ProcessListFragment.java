@@ -1,7 +1,8 @@
 package com.rpereira.killtheapp.layout;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,8 +15,10 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +51,7 @@ public class ProcessListFragment extends Fragment
     private RecyclerView processListRecyclerView;
     private ProcessListRecycleViewAdapter processListRecyclerViewAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private FloatingActionButton refreshButton;
     private boolean isListAll = true;
 
     @Override
@@ -88,8 +92,8 @@ public class ProcessListFragment extends Fragment
     }
 
     private void initRefreshButton(View view) {
-        FloatingActionButton addButton = (FloatingActionButton) view.findViewById(R.id.refreshButton);
-        addButton.setOnClickListener(new View.OnClickListener() {
+        this.refreshButton = (FloatingActionButton) view.findViewById(R.id.refreshButton);
+        this.refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View buttonView) {
                 listProcess();
@@ -106,10 +110,30 @@ public class ProcessListFragment extends Fragment
     private View.OnClickListener setViewListAction() {
         return new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                int position = processListRecyclerView.getChildLayoutPosition(v);
+            public void onClick(View view) {
+                int position = processListRecyclerView.getChildLayoutPosition(view);
                 Process process = processListRecyclerViewAdapter.get(position);
-                setKillProcessAlertDialog(processListRecyclerView, process);
+
+                ProcessFragment processFragment = ProcessFragment.newInstance(process);
+                setSharedElementReturnTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(R.transition.transition));
+                setExitTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(android.R.transition.fade));
+
+                processFragment.setSharedElementEnterTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(R.transition.transition));
+                processFragment.setEnterTransition(TransitionInflater.from(
+                        getActivity()).inflateTransition(android.R.transition.fade));
+
+                String tag = "transitionProcessIcon" + position;
+                getFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, processFragment)
+                        .addToBackStack("Process")
+                        .addSharedElement(view.findViewWithTag(tag), tag)
+                        .commit();
+
+                //setKillProcessAlertDialog(processListRecyclerView, process);
             }
         };
     }
@@ -156,6 +180,10 @@ public class ProcessListFragment extends Fragment
         }
         this.processListRecyclerViewAdapter.updateList(newProcessList);
         this.swipeRefreshLayout.setRefreshing(false);
+
+        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(), R.animator.button_rotate);
+        set.setTarget(this.refreshButton);
+        set.start();
     }
 
     private String getProcessName(PackageManager pm, AndroidAppProcess runningProcess) {

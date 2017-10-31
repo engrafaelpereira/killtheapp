@@ -8,4 +8,8 @@
     <string name="settings">Settings</string>
     <string name="process_without_icon">Maybe will show processes without icon</string>
     <string name="list_all">List all</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="process_icon">Process Icon</string>
 </resources>
